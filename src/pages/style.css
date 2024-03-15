@@ -1,0 +1,71 @@
+.myHeading{
+    text-align: left;
+    font-weight: bold;
+}
+.spanColor{
+    color:#00A95A !important;
+    font-weight: bold;
+    text-decoration: none;
+   
+}
+.handlingText{
+    text-align: left;
+}
+.heading{
+    text-align: left;
+}
+.greenParagraph{
+    color:#00A95A;
+    text-align: right;
+    font-weight: bold;
+}
+.logo{
+    display: flex;
+    margin-top: 50px;
+    margin-left: 70px;
+}
+.logoTwo{
+    display: flex;
+    margin-top: 20px;
+    margin-left: 60px;
+
+}
+.myBtn{
+    background-color: #00A95A !important;
+}
+
+.validationDiv{
+    text-align: left;
+    font-size: smaller;
+    line-height: 38px;
+}
+.validationDivSpan{
+    text-align: left;
+    margin-top: 2px;
+    margin-bottom: 2px;
+   
+}
+.RightSection{
+    background-color: #CEF3E1;
+}
+.RightSectionText ul  h3{
+    text-align: left;
+    font-weight: bold;
+    margin-top: 125px;
+}
+.RightSectionText p{
+    text-align: left;
+   
+    align-items: left;
+    font-size: smaller;
+}
+.RightSectionText ul {
+    text-align: left;
+    font-weight:normal;
+    line-height: 35px;
+    list-style:none;
+   
+}
+.RightSection ul li{
+   font-weight: bold;
+}
