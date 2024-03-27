@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "./layouts/dashboard";
 import LogoOnlyLayout from "./layouts/LogoOnlyLayout";
-
+import { Dashboard } from "./Dashboard";
 
 // ----------------------------------------------------------------------
 const Authentication = () => {

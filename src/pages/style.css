@@ -69,3 +69,57 @@
 .RightSection ul li{
    font-weight: bold;
 }
+ /* customer */
+ .icondiv {
+    width: 200px;
+    display: flex;
+    background-color: #00A95A;
+    justify-content: center;
+    
+}
+/* dashboard */
+.first{
+    height: 200px;
+    width: 300px;
+    margin: 20px;
+    background-color: rgb(148, 238, 167);
+    border-radius: 15px;
+   
+}
+.first1{
+    height: 200px;
+    width: 300px;
+    margin: 20px;
+    background-color: #D0F2FE;
+   
+
+}
+.first2{
+    height: 200px;
+    width: 300px;
+    margin: 20px;
+    background-color: #FFE8DA;
+    border-radius: 15px;
+}
+.fab{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 35px;
+}
+
+.text {
+    display: inline-block;
+    margin-top: 12px;
+}
+.txtst{
+    text-align: left;
+    margin: 20px;
+    font-weight: bold;
+}
+.add-bgColor{
+    background-color: #EAFCD4;
+}
+.three{
+    display: flex;
+}
