@@ -1,6 +1,8 @@
-import React from 'react'
+import React from 'react';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import { Snackbar } from "@mui/material";
+
 import Avatar from '@mui/material/Avatar';
 import { deepPurple } from '@mui/material/colors';
 import { FormControl } from '@mui/material';
@@ -17,178 +19,237 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack'; 
+import Stack from '@mui/material/Stack';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export const AddCustomer = () => {
-    const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
- 
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [password, setPassword] = useState('')
+    const [successAlert, setSuccessAlert] = useState(false);
+    const [errorAlert, setErrorAlert] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        industryType: '', // Added industryType state
+        customerType: '' // Added customerType state
+    });
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setFormData({ ...formData, [name]: value });
+    };
 
-  const handleMouseDownPassword = (event) => {
-      event.preventDefault();
-  };
-  const handleChange = (event) => {
-      setPassword(event.target.value);
-  };
-  const currencies = [
-      {
-          label: 'Website',
-      },
-      {
-          label: 'Front-end',
-      },
-      {
-          label: 'Back-end',
-      },
-      {
+    const handleSubmit = async (event) => {
+        const { firstName, lastName, email, password, industryType, customerType } = formData;
 
-          label: 'Web-app',
-      },
-  ];
-
- 
-      return (
-    <div style={{ marginTop: -80 }}>
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-
-          <Button style={{ marginRight: 17 }}
-            id="basic-button"
-            aria-controls={open ? 'basic-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleClick}
-          >
-            <Avatar sx={{ bgcolor: deepPurple[500] }}>M</Avatar>
-
-          </Button>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-          >
-            <MenuItem onClick={handleClose}><b>Meta Logic</b>
-
-            </MenuItem>
-            <MenuItem onClick={handleClose}> <p>dynamiclogix@gmail.com</p></MenuItem>
-
-            <MenuItem onClick={handleClose}>Change Password</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-          </Menu>
-        </div>
-
-
-
-
-        <div className='container'>
-
-
-
-
-
-<FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-
-    <TextField
-        id="outlined-password-input"
-        label="First Name"
-        type="First Name"
-    />
-</FormControl>
-<FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-    <TextField
-        id="outlined-password-input"
-        label="Last Name"
-        type="Last Name"
-    />
-</FormControl>
-<FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-    <TextField
-        id="outlined-password-input"
-        label="Email"
-        type="Email"
-    />
-</FormControl>
-<FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-    <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-    <OutlinedInput
-        id="outlined-adornment-password"
-        type={showPassword ? 'text' : 'password'}
-        endAdornment={
-            <InputAdornment position="end">
-                <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge="end"
-                >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-            </InputAdornment>
+        event.preventDefault();
+        try {
+            const response = await axios.post('http://146.190.164.174:4000/api/customer/signup_customer', {
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                password: password,
+                industry_type: industryType, // Send industryType in request
+                customer_type: customerType, // Send customerType in request
+            });
+            console.log('Customer added successfully:', response.data);
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                industryType: '', // Reset industryType state
+                customerType: '' // Reset customerType state
+            });
+            setSuccessAlert(true);
+        } catch (error) {
+            console.error('Error adding customer:', error.response);
+            setErrorAlert(true);
+            setErrorMessage(error.response.data.message);
         }
-        label="Password"
-    />
-</FormControl>
-<br />
-<FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-    <TextField
-        id="outlined-select-currency"
-        select
-        label="Customer Type"
-        type='Customer type'
+    };
 
-    >
-        {currencies.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-                {option.label}
-            </MenuItem>
-        ))}
-    </TextField>
-</FormControl>
-<FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-    <TextField
-        id="outlined-select-currency"
-        select
-        label="Insustry Type"
+    const handleCloseAlert = () => {
+        setSuccessAlert(false);
+        setErrorAlert(false);
+        setErrorMessage('');
+    };
+
+    const navigate = useNavigate();
+    const handleCancel = () => {
+        navigate("/customer");
+    };
 
 
-    >
-        {currencies.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-                {option.label}
-            </MenuItem>
-        ))}
-    </TextField>
 
-    <br />
-    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Stack direction="row" spacing={2}>
-            <Button variant="outlined" color='success' startIcon={<CloseIcon />}>
-                Close
-            </Button>
-            <Button variant="contained" className='btn'>
-                Send
-            </Button>
-        </Stack>
-    </div>
-</FormControl>
-</div>
-</div>
+    const [showPassword, setShowPassword] = React.useState(false);
 
-</div> 
- );
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
+
+    const currencies = [
+        {
+            label: 'Website',
+            value: 'Website' // Added value for each option
+        },
+        {
+            label: 'Front-end',
+            value: 'Front-end' // Added value for each option
+        },
+        {
+            label: 'Back-end',
+            value: 'Back-end' // Added value for each option
+        },
+        {
+            label: 'Web-app',
+            value: 'Web-app' // Added value for each option
+        },
+    ];
+
+   
+
+
+    return (
+        <div style={{ marginTop: -80 }}>
+
+                <div className='container'>
+
+
+
+
+                    <form onSubmit={handleSubmit}>
+                        <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
+
+                            <TextField
+                                id="outlined-password-input"
+                                label="First Name"
+                                type="First Name"
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </FormControl>
+                        <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
+                            <TextField
+                                id="outlined-password-input"
+                                label="Last Name"
+                                type="Last Name"
+                                name='lastName'
+                                value={formData.lastName}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </FormControl>
+                        <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
+                            <TextField
+                                id="outlined-password-input"
+                                label="Email"
+                                type="Email"
+                                name="email"
+
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </FormControl>
+                        <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
+                            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-password"
+                                type={showPassword ? 'text' : 'password'}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                label="Password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+
+                            />
+                        </FormControl>
+                        <br />
+                        <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
+                            <TextField
+                                id="outlined-select-industry-type"
+                                select
+                                label="Industry Type"
+                                name="industryType"
+                                value={formData.industryType}
+                                onChange={handleInputChange}
+                            >
+                                {currencies.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </FormControl>
+                        <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
+                            <TextField
+                                id="outlined-select-currency"
+                                select
+                                label="Customer Type"
+                                name="customerType"
+                                value={formData.customerType}
+                                onChange={handleInputChange}
+                            >
+
+
+                                 {currencies.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+
+                            <br />
+                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <Stack direction="row" spacing={2}>
+                                    <Button onClick={handleCancel} type="submit"
+                                        variant="outlined" color='success' startIcon={<CloseIcon />}>
+                                        Close
+                                    </Button>
+                                    <Button type='submit' variant="contained" className='btn'>
+                                        Send
+                                    </Button>
+                                </Stack>
+                            </div>
+                        </FormControl>
+                        <Snackbar
+                            open={successAlert}
+                            autoHideDuration={6000}
+                            onClose={handleCloseAlert}
+                            message="Customer added successfully"
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        />
+                        <Snackbar
+                            open={errorAlert}
+                            autoHideDuration={6000}
+                            onClose={handleCloseAlert}
+                            message={errorMessage}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        />
+                    </form>
+                </div>
+            </div>
+
+
+    );
 }

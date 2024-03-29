@@ -130,7 +130,8 @@ export const Loginpages = () => {
                 />
                 <br />
                 <div>
-                  <p className='greenParagraph'>Forget your password</p>
+                  <p className='greenParagraph'>
+                    <Link to='/forget' style={{textDecoration:'none', color:'inherit'}}> Forget your password</Link></p>
                 </div>
 
 

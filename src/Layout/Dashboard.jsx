@@ -10,50 +10,15 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 
 export const Dashboard = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
   return (
     <div style={{ marginTop: -80 }}>
       <div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-
-          <Button style={{marginRight:17}}
-            id="basic-button"
-            aria-controls={open ? 'basic-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleClick}
-          >
-            <Avatar sx={{ bgcolor: deepPurple[500] }}>M</Avatar>
-
-          </Button>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-          >
-            <MenuItem onClick={handleClose}><b>Meta Logic</b>
-
-            </MenuItem>
-            <MenuItem onClick={handleClose}> <p>dynamiclogix@gmail.com</p></MenuItem>
-
-            <MenuItem onClick={handleClose}>Change Password</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-          </Menu>
-        </div>
+       
 
 
         <FormControl sx={{ m: 1, }} variant="outlined">

@@ -12,17 +12,61 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import Avatar from '@mui/material/Avatar';
 import { deepPurple } from '@mui/material/colors';
 import { logo } from '../Asset';
-import { Routes, Route, Link } from 'react-router-dom';
-import { Dashboard } from '../Layout/Dashboard';
-import { Customer } from '../Layout/Customer';
-import { Transection } from '../Layout/Transection';
-import { Support } from '../Layout/Support';
+import { Link } from 'react-router-dom';
+import AppBar from '@mui/material/AppBar';
+import CssBaseline from '@mui/material/CssBaseline';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useState } from 'react';
 
 const drawerWidth = 240;
 
 export const Pagelyout = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <Box sx={{ display: 'flex' }}>
+         <CssBaseline />
+         {/* <AppBar position="fixed"  style={{background:'none', boxShadow:'none'}}>
+       
+        <div style={{ marginLeft: 'auto'}}>
+          <Button
+            style={{ marginRight: 17   , marginTop:'15px' ,marginRight:'15px'}}
+            id="basic-button"
+            aria-controls={anchorEl ? 'basic-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={anchorEl ? 'true' : undefined}
+            onClick={handleClick}
+          >
+            <Avatar sx={{ bgcolor: deepPurple[500] }}>M</Avatar>
+          </Button>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem onClick={handleClose}><b>Meta Logic</b></MenuItem>
+            <MenuItem onClick={handleClose}><p>dynamiclogix@gmail.com</p></MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to='/changepassword' style={{ textDecoration: 'none', color: 'inherit' }}>Change Password</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
+        </div>
+    </AppBar> */}
       
       <Drawer
         sx={{
