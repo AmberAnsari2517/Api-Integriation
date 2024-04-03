@@ -64,6 +64,7 @@ export const Loginpages = () => {
       );
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('email',formData.email);
         console.log('login successful:', response.data);
         navigate('/dashboard');
       } else {

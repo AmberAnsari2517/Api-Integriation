@@ -26,7 +26,7 @@ export const Router = () => {
           <Route path="/support-tickets" element={<Support />} />
           <Route path="/transactions" element={<Transection />} />
           <Route path='/changepassword' element={<Changepassword/>}/>
-          <Route path='/edit' element={<Edit/>}/>
+          <Route path="edit/:id" element={<Edit />} />
         </Route>
         <Route path='/' element={<AthunticationLyout />}>
         <Route path='/forget' element={<Forgetpassword/>}/>

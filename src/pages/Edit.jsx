@@ -1,225 +1,214 @@
-import React from 'react'
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-import { Snackbar } from "@mui/material";
-
-import Avatar from '@mui/material/Avatar';
-import { deepPurple } from '@mui/material/colors';
-import { FormControl } from '@mui/material';
-import LanguageIcon from '@mui/icons-material/Language';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import React, { useState } from 'react';
+import { TextField, Button, Snackbar, Autocomplete, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 
 export const Edit = () => {
-    const [successAlert, setSuccessAlert] = useState(false);
-    const [errorAlert, setErrorAlert] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        industryType: '', // Added industryType state
-        customerType: '',// Added customerType state
-        phoneNum: ''
-    });
+  const { state } = useLocation();
+  const { id } = useParams();
+  const [formData, setFormData] = useState({
+    firstName: state?.first_name || '',
+    lastName: state?.last_name || '',
+    email: state?.user?.email || '',
+    profileImage: state?.profile_image || '',
+    phoneNumber: state?.phone_number || '',
+    industryType: state?.industry_type || null // Set initial value to null
+  });
+  const [successAlert, setSuccessAlert] = useState(false);
+  const [errorAlert, setErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
-    };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const { firstName, lastName, email, industryType, phoneNumber, profileImage } = formData;
 
-    const handleSubmit = async (event) => {
-        const { firstName, lastName, email, password, industryType, customerType } = formData;
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token not found");
+      }
 
-        event.preventDefault();
-        try {
-            const response = await axios.post('http://146.190.164.174:4000/api/customer/signup_customer', {
-                first_name: firstName,
-                last_name: lastName,
-                email: email,
-                password: password,
-                industry_type: industryType, // Send industryType in request
-                customer_type: customerType, // Send customerType in request
-            });
-            console.log('Customer added successfully:', response.data);
-            setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                industryType: '', // Reset industryType state
-                customerType: '' // Reset customerType state
-            });
-            setSuccessAlert(true);
-        } catch (error) {
-            console.error('Error adding customer:', error.response);
-            setErrorAlert(true);
-            setErrorMessage(error.response.data.message);
-        }
-    };
+      const headers = {
+        'x-sh-auth': token,
+      };
 
-    const handleCloseAlert = () => {
-        setSuccessAlert(false);
-        setErrorAlert(false);
-        setErrorMessage('');
-    };
+      // Log the request payload
+      console.log('Request Payload:', {
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        industry_type: industryType,
+        phone_number: phoneNumber,
+        profile_image: profileImage
+      });
 
-    const navigate = useNavigate();
-    const handleCancel = () => {
-        navigate("/customer");
-    };
-
-
-
-
-
-    const currencies = [
+      const response = await axios.put(
+        `http://146.190.164.174:4000/api/customer/edit_customer_by_admin/${id}`,
         {
-            label: 'Website',
-            value: 'Website' // Added value for each option
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          industry_type: industryType,
+          phone_number: phoneNumber,
+          profile_image: profileImage
         },
-        {
-            label: 'Front-end',
-            value: 'Front-end' // Added value for each option
-        },
-        {
-            label: 'Back-end',
-            value: 'Back-end' // Added value for each option
-        },
-        {
-            label: 'Web-app',
-            value: 'Web-app' // Added value for each option
-        },
-    ];
+        { headers }
+      );
 
+      console.log('Customer edit successful:', response.data);
+      setSuccessAlert(true);
+    } catch (error) {
+      console.error('Error editing customer:', error.response);
+      setErrorAlert(true);
+      let errorMessage = 'An unexpected error occurred';
 
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
 
+      setErrorMessage(errorMessage);
+    }
+  };
 
+  const handleCloseAlert = () => {
+    setSuccessAlert(false);
+    setErrorAlert(false);
+    setErrorMessage('');
+  };
 
-    return (
-        <div style={{ marginTop: -80 }}>
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-            <div className='container'>
+  const navigate = useNavigate();
+  const handleCancel = () => {
+    navigate("/customer");
+  };
 
-
-
-
-                <form onSubmit={handleSubmit}>
-                    <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-
-                        <TextField
-                            id="outlined-password-input"
-                            label="First Name"
-                            type="First Name"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </FormControl>
-
-
-                    <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-                        <TextField
-                            id="outlined-password-input"
-                            label="Last Name"
-                            type="Last Name"
-                            name='lastName'
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-                        <TextField
-                            id="outlined-password-input"
-                            label="Email"
-                            type="Email"
-                            name="email"
-
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-
-                        <TextField
-                            id="outlined-password-input"
-                            label="Pahone"
-                            type="number"
-                            name="phoneNum"
-                            value={formData.phoneNum}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </FormControl>
-
-                    <br />
-                    <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-                        <TextField
-                            id="outlined-select-industry-type"
-                            select
-                            label="Industry Type"
-                            name="industryType"
-                            value={formData.industryType}
-                            onChange={handleInputChange}
-                        >
-                            {currencies.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-                
-                        <br />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Stack direction="row" spacing={2}>
-                                <Button onClick={handleCancel} type="submit"
-                                    variant="outlined" color='success' startIcon={<CloseIcon />}>
-                                    Close
-                                </Button>
-                                <Button type='submit' variant="contained" className='btn'>
-                                    Save
-                                </Button>
-                            </Stack>
-                        </div>
-                    </FormControl>
-                    <Snackbar
-                        open={successAlert}
-                        autoHideDuration={6000}
-                        onClose={handleCloseAlert}
-                        message="Customer added successfully"
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    />
-                    <Snackbar
-                        open={errorAlert}
-                        autoHideDuration={6000}
-                        onClose={handleCloseAlert}
-                        message={errorMessage}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    />
-                </form>
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="container">
+          <h1 style={{ marginBottom: "50px" }}>Edit Customer</h1>
+          <div className="row">
+            <div className="col-lg-6">
+              <TextField
+                fullWidth
+                name="firstName"
+                className="first-name"
+                id="outlined-basic"
+                label="First Name"
+                type="text"
+                variant="outlined"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                required
+                style={{ marginBottom: '30px' }}
+              />
+              <TextField
+                fullWidth
+                name="email"
+                className="email"
+                id="outlined-basic"
+                label="Email"
+                type="email"
+                variant="outlined"
+                value={formData.email}
+                readOnly
+                required
+                style={{ marginBottom: '30px' }}
+              />
+              <Autocomplete
+                fullWidth
+                options={['Software', 'Healthcare', 'Education']}
+                renderInput={(params) => <TextField {...params} label="Industry Type" variant="outlined" />}
+                value={formData.industryType}
+                onChange={(event, newValue) => {
+                  setFormData({ ...formData, industryType: newValue });
+                }}
+                style={{ marginBottom: '30px' }}
+              />
             </div>
+            <div className="col-lg-6">
+              <TextField
+                fullWidth
+                name='lastName'
+                className="last-name"
+                id="outlined-basic"
+                label="Last Name"
+                type="text"
+                variant="outlined"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                required
+                style={{ marginBottom: '30px' }}
+              />
+              <TextField
+                fullWidth
+                name="profileImage"
+                className="profile-image"
+                id="outlined-basic"
+                label="profile-image"
+                type="text"
+                variant="outlined"
+                value={formData.profileImage}
+                onChange={handleInputChange}
+                style={{ marginBottom: '30px' }}
+              />
+              <TextField
+                fullWidth
+                name='phoneNumber'
+                className="phoneNumber"
+                id="outlined-basic"
+                label="phoneNumber"
+                type="number"
+                variant="outlined"
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
+        
+                style={{ marginBottom: '30px' }}
+              />
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Stack direction="row" spacing={2}>
+              <Button
+                onClick={handleCancel}
+                variant="outlined"
+                color="success"
+                startIcon={<CloseIcon />}
+              >
+                Close
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                className="btn"
+              >
+                Send
+              </Button>
+            </Stack>
+          </div>
         </div>
+      </form>
+      <Snackbar
+        open={successAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        message="Customer edit successfully"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      />
+      <Snackbar
+        open={errorAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        message={errorMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      />
+    </>
+  );
+};
 
-    )
-}
+

@@ -1,4 +1,3 @@
-
 import Avatar from '@mui/material/Avatar';
 import { deepPurple } from '@mui/material/colors';
 import { FormControl } from '@mui/material';
@@ -27,7 +26,14 @@ import MenuItem from '@mui/material/MenuItem';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 const PlusIcon = createSvgIcon(
   // credit: plus icon from https://heroicons.com/
   <svg
@@ -54,19 +60,37 @@ const columns = [
 ];
 
 export const Customer = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const [open, setOpen] = React.useState(false);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleClickOpen = () => {
+    setOpen(true);
   };
+
   const handleClose = () => {
-    setAnchorEl(null);
+    setOpen(false);
   };
+
+
+
+
+
+
+  const handleEditCustomer = (row) => {
+    console.log(row._id, "hjkkhjj");
+    navigate(`/edit/${row.user._id}`, { state: row })
+  }
+
+
+
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+
 
   const handleChangePage = (newPage) => {
     setPage(newPage);
@@ -117,10 +141,8 @@ export const Customer = () => {
   };
 
   const handleDelete = async (id) => {
-  // Specify any additional configuration options here
-
     try {
-      const response=await axios.delete(`http://146.190.164.174:4000/api/customer/delete_customer/${id}`, {
+      const response = await axios.delete(`http://146.190.164.174:4000/api/customer/delete_customer/${id}`, {
         headers: {
           'x-sh-auth': localStorage.getItem('token')
         }
@@ -131,10 +153,10 @@ export const Customer = () => {
       console.error("Error deleting customer:", error.response);
     }
   };
-  const navigate=useNavigate();
-  const handleEdit = ()=>{
-    navigate('/edit')
-  }
+
+  const navigate = useNavigate();
+
+
   const SearchBar = ({ setSearchQuery }) => (
     <form>
       <TextField
@@ -148,23 +170,17 @@ export const Customer = () => {
     </form>
   );
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (customers.length === 0) {
-    return <div>No customers found.</div>;
-  }
-
   return (
     <div style={{ marginTop: -80 }}>
       <div>
+
         <div style={{ display: 'flex', justifyContent: 'flex-end' }} className='mt-5'>
           <Link to='/addcustomer'>
             <Button variant="contained" className='btn' startIcon={<AddIcon />}>
               Add Customer
             </Button>
           </Link>
+
         </div>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }} className='mt-3'>
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -177,58 +193,87 @@ export const Customer = () => {
             }}
           />
         </div>
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-          <TableContainer sx={{ maxHeight: 440 }}>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableCell key={column.id} align="center" style={{ minWidth: column.minWidth }}>
-                      {column.label}
-                    </TableCell>
-                  ))}
-                  <TableCell align="center">Actions</TableCell>
-
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {customers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.id === 'email' ? row.user.email : row[column.id]}
-                          </TableCell>
-
-                        );
-                      })}
-
-                      <TableCell>
-
-                        <Button onClick={() => handleDelete(row.user._id)}> <DeleteIcon /></Button>
-                        <Button onClick={() => handleEdit(row._id)}> <EditIcon /></Button>
-
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <CircularProgress />
+          </div>
+        ) : (
+          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableCell key={column.id} align="center" style={{ minWidth: column.minWidth }}>
+                        {column.label}
                       </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={customers.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>
+                    ))}
+                    <TableCell align="center">Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {customers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    return (
+                      <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
+                        {columns.map((column) => {
+                          const value = row[column.id];
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {column.id === 'email' ? row.user.email : row[column.id]}
+                            </TableCell>
+                          );
+                        })}
+                        <TableCell>
+                          <React.Fragment>
+                            <Button variant="outlined" onClick={handleClickOpen}>
+                              <DeleteIcon />
+                            </Button>
+                            <Dialog
+                              fullScreen={fullScreen}
+                              open={open}
+                              onClose={handleClose}
+                              aria-labelledby="responsive-dialog-title"
+                            >
+                              <DialogTitle id="responsive-dialog-title">
+                                {' Are you sure want to delete this customer'}
+                              </DialogTitle>
+                              <DialogContent>
 
+                              </DialogContent>
+                              <DialogActions>
+                                <Button autoFocus onClick={handleClose}>
+                                  Cancel
+                                </Button>
+                                
+                                <Button onClick={() => {
+                                  handleDelete(row.user._id);
+                                  handleClose(); // Close the dialog box
+                                }}>Delete</Button>
+                              </DialogActions>
+                            </Dialog>
+                          </React.Fragment>
+                          <Button onClick={() => handleEditCustomer(row)}> <EditIcon /></Button>
+
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 100]}
+              component="div"
+              count={customers.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+        )}
       </div>
+
     </div>
   );
 };

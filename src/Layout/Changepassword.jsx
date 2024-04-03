@@ -1,109 +1,168 @@
 import React from 'react';
-import Fab from '@mui/material/Fab';
-import Avatar from '@mui/material/Avatar';
-import { deepPurple } from '@mui/material/colors';
-import { FormControl } from '@mui/material';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack';
+import IconButton from '@mui/material/IconButton';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import axios from 'axios';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 
-export const Changepassword = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+export const Changepassword = ()=>{
+ const [oldPassword, setOldPassword] = useState('');
+const [newPassword, setNewPassword] = useState('');
+const [confirmNewPassword, setConfirmNewPassword] = useState('');
+const [errorMessage, setErrorMessage] = useState('');
+const [showOldPassword, setShowOldPassword] = useState(false);
+const [showNewPassword, setShowNewPassword] = useState(false);
+const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+
+
+const handleTogglePasswordVisibility = (field) => {
+    switch (field) {
+      case 'oldPassword':
+        setShowOldPassword(!showOldPassword);
+        break;
+      case 'newPassword':
+        setShowNewPassword(!showNewPassword);
+        break;
+      case 'confirmNewPassword':
+        setShowConfirmNewPassword(!showConfirmNewPassword);
+        break;
+      default:
+        break;
+    }
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+
+const handleChangePassword = async (e) => {
+e.preventDefault();
+try {
+  if (newPassword !== confirmNewPassword) {
+    setErrorMessage('New password and confirm password must match');
+    return;
+  }
+  const token=localStorage.getItem("token")
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-sh-auth': token,
   };
-
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [password, setPassword] = useState('');
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
+  const reqObj = {
+    old_password: oldPassword,
+    new_password: newPassword,
+    confirm_password: confirmNewPassword,
   };
+  const response = await axios.put(`http://146.190.164.174:4000/api/app_api/change_password`, reqObj, {
+    headers: headers,
+  });
+  
+  console.log('Password changed successfully',response.data);
+  setOldPassword('');
+  setNewPassword('');
+  setConfirmNewPassword('');
+  setErrorMessage('');
+  return true; // Return true on success
+} catch (error) {
+  console.error('Error changing password:', error.response);
+  setErrorMessage('Error changing password. Please try again.');
+  return false; // Return false on failure
+}
+};
 
-
-  return (
-    <div style={{ marginTop: -80 }}>
-      <div>
-     
-
-        <div className='container'>
-          <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-            <TextField
-              id="outlined-password-input"
-              label="First Name"
-              type="First Name"
-            />
-          </FormControl><br/>
-          <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-            <TextField
-              id="outlined-password-input"
-              label="Last Name"
-              type="Last Name"
-            />
-          </FormControl>
-          <br/>
-          <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-            <TextField
-              id="outlined-password-input"
-              label="Email"
-              type="Email"
-            />
-           
-          </FormControl>
-          <br/>
-          <FormControl sx={{ m: 1, width: '55ch' }} variant="outlined">
-            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-            <OutlinedInput
-              id="outlined-adornment-password"
-              type={showPassword ? 'text' : 'password'}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              }
-              label="Password"
-            />
-          </FormControl>
-          <br/>
-          <FormControl>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-
-              <Button variant="contained" className='btn'>
-                Send
-              </Button>
-
-            </div>
-          </FormControl>
-
-
-        </div>
-      </div>
-    </div>
-  );
+return (
+    <form onSubmit={handleChangePassword}>
+    <TextField
+      id="oldPassword"
+      label="Old Password"
+      type={showOldPassword ? 'text' : 'password'}
+      value={oldPassword}
+      onChange={(e) => setOldPassword(e.target.value)}
+      fullWidth
+      margin="normal"
+      required
+      sx={{
+        maxWidth: '100%',
+        '& label.Mui-focused': {
+            color: '#00A95A',
+        },
+        '& .MuiOutlinedInput-root': {
+            '&.Mui-focused fieldset': {
+                borderColor: '#00A95A',
+            },
+        },
+    }}
+      InputProps={{
+        endAdornment: (
+          <IconButton onClick={() => handleTogglePasswordVisibility('oldPassword')} edge="end">
+            {showOldPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
+        ),
+      }}
+    />
+    <TextField
+      id="newPassword"
+      label="New Password"
+      type={showNewPassword ? 'text' : 'password'}
+      value={newPassword}
+      onChange={(e) => setNewPassword(e.target.value)}
+      fullWidth
+      margin="normal"
+      required
+      sx={{
+        maxWidth: '100%',
+        '& label.Mui-focused': {
+            color: '#00A95A',
+        },
+        '& .MuiOutlinedInput-root': {
+            '&.Mui-focused fieldset': {
+                borderColor: '#00A95A',
+            },
+        },
+    }}
+      InputProps={{
+        endAdornment: (
+          <IconButton onClick={() => handleTogglePasswordVisibility('newPassword')} edge="end">
+            {showNewPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
+        ),
+      }}
+    />
+    <TextField
+      id="confirmNewPassword"
+      label="Confirm New Password"
+      type={showConfirmNewPassword ? 'text' : 'password'}
+      value={confirmNewPassword}
+      onChange={(e) => setConfirmNewPassword(e.target.value)}
+      fullWidth
+      margin="normal"
+      required
+      sx={{
+        maxWidth: '100%',
+        '& label.Mui-focused': {
+            color: '#00A95A',
+        },
+        '& .MuiOutlinedInput-root': {
+            '&.Mui-focused fieldset': {
+                borderColor: '#00A95A',
+            },
+        },
+    }}
+      InputProps={{
+        endAdornment: (
+          <IconButton onClick={() => handleTogglePasswordVisibility('confirmNewPassword')} edge="end">
+            {showConfirmNewPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
+        ),
+      }}
+    />
+    {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
+    <Button
+      type="submit"
+      variant="contained"
+      sx={{ bgcolor: '#00A95A', '&:hover': { bgcolor: '#00753e' } }}
+    >
+      Change Password
+    </Button>
+  </form>
+)
 }

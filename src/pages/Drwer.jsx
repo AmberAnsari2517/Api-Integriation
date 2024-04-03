@@ -21,11 +21,22 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
+import Modal from '@mui/material/Modal';
+import { Changepassword } from '../Layout/Changepassword';
+import { useNavigate } from 'react-router-dom';
+import { Logout } from '../Layout/Logout';
 
 const drawerWidth = 240;
 
 export const Pagelyout = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const userEmail = localStorage.getItem("email");
+
+  
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -33,10 +44,48 @@ export const Pagelyout = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+   // handle logout
+   const navigate = useNavigate();
+   const handleLogout = async () => {
+     const success = await Logout(navigate);
+   };
+ 
+   // hanlde open model
+   const handleOpenModal = () => {
+     setIsModalOpen(true);
+   };
+ 
+   const handleCloseModal = () => {
+     setIsModalOpen(false);
+   };
+   // handle password change
+   const handleChangePassword = async () => {
+     try {
+       const token = localStorage.getItem('token');
+       const success = await Changepassword({
+         oldPassword: oldPassword,
+         newPassword: newPassword,
+         token: token
+       });
+       if (success) {
+         alert('Password changed successfully!');
+         setIsModalOpen(false);
+       } else {
+         alert('Failed to change password. Please try again.');
+       }
+     } catch (error) {
+       console.error('Error changing password:', error.response);
+       alert('Failed to change password. Please try again.');
+     }
+   };
+ 
   return (
+    <div>
     <Box sx={{ display: 'flex' }}>
          <CssBaseline />
-         {/* <AppBar position="fixed"  style={{background:'none', boxShadow:'none'}}>
+        
+         <AppBar position="fixed"  style={{background:'none', boxShadow:'none'}}>
        
         <div style={{ marginLeft: 'auto'}}>
           <Button
@@ -59,15 +108,45 @@ export const Pagelyout = () => {
             }}
           >
             <MenuItem onClick={handleClose}><b>Meta Logic</b></MenuItem>
-            <MenuItem onClick={handleClose}><p>dynamiclogix@gmail.com</p></MenuItem>
-            <MenuItem onClick={handleClose}>
-              <Link to='/changepassword' style={{ textDecoration: 'none', color: 'inherit' }}>Change Password</Link>
-            </MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={handleClose}>{userEmail}</MenuItem>
+            <MenuItem onClick={handleOpenModal}>Change Password</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </div>
-    </AppBar> */}
-      
+        <div>
+        </div>
+       
+    </AppBar> 
+    <Modal
+          open={isModalOpen}
+          onClose={handleCloseModal}
+          aria-labelledby="change-password-modal"
+          aria-describedby="change-password-modal-description"
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              bgcolor: 'background.paper',
+              border: '2px solid #000',
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Changepassword
+              oldPassword={oldPassword}
+              newPassword={newPassword}
+              setOldPassword={setOldPassword}
+              setNewPassword={setNewPassword}
+              setConfirmPassword={setConfirmPassword}
+              handleChangePassword={handleChangePassword}
+            />
+          </Box>
+        </Modal>
+    
       <Drawer
         sx={{
           width: drawerWidth,
@@ -132,6 +211,7 @@ export const Pagelyout = () => {
               <ListItemText primary="Transactions" />
             </ListItemButton>
           </Link>
+          
         </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>
@@ -139,6 +219,7 @@ export const Pagelyout = () => {
        
       </Box>
     </Box>
+    </div>
   );
 };
 
