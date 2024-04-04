@@ -225,7 +225,7 @@ export const Signpage = () => {
             </div>
 
           </div>
-          <div className='col-5 RightSection' >
+          <div className='col-5  col-sm-5 d-none d-md-block RightSection' >
             <div className='RightSectionText'>
 
 

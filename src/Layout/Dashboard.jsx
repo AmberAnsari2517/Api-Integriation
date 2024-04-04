@@ -26,7 +26,7 @@ export const Dashboard = () => {
       const response = await axios.post(`http://146.190.164.174:4000/api/customer/get_customers`, {
 
       }, { headers: headers });
-      setTotaluser(response.data.customer.length);
+      setTotaluser(response.data.count);
       console.log("successful", response.data)
     } catch (error) {
       console.error('Error fetching domain data:', error.response);

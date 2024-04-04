@@ -1,7 +1,8 @@
-import React from 'react'
+import React from 'react';
 import { styled } from "@mui/material";
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom'; // Import Navigate from react-router-dom
 import { Pagelyout } from '../pages/Drwer';
+import { isNotAuthenticated } from './Atuth';
 
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 92;
@@ -10,7 +11,7 @@ const StyledRoot = styled('div')({
     display: 'flex',
     minHeight: '100%',
     overflow: 'hidden',
-  });
+});
 
 const Main = styled('div')(({ theme }) => ({
     flexGrow: 1,
@@ -26,12 +27,14 @@ const Main = styled('div')(({ theme }) => ({
 }));
 
 export const DashboardLyout = () => {
-  return (
-    <StyledRoot>
-      <Pagelyout/>
-      <Main>
-        <Outlet/>
-      </Main>
-    </StyledRoot>
-  )
-}
+    const auth = !isNotAuthenticated(); // Assuming isNotAuthenticated() returns true if not authenticated
+
+    return (
+        <StyledRoot>
+            <Pagelyout />
+            <Main>
+                {auth ? <Outlet /> : <Navigate to="/" />} {/* Use Navigate component */}
+            </Main>
+        </StyledRoot>
+    );
+};

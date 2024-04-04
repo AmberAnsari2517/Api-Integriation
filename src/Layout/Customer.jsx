@@ -34,6 +34,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+
 const PlusIcon = createSvgIcon(
   // credit: plus icon from https://heroicons.com/
   <svg
@@ -63,6 +64,7 @@ export const Customer = () => {
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -72,27 +74,19 @@ export const Customer = () => {
     setOpen(false);
   };
 
-
-
-
-
-
   const handleEditCustomer = (row) => {
     console.log(row._id, "hjkkhjj");
-    navigate(`/edit/${row.user._id}`, { state: row })
+    navigate(`/edit/${row.user._id}`, { state: row })//faiza
   }
 
-
-
-
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
-  const handleChangePage = (newPage) => {
+  const [nextcustomer, setnextCustomer] = useState();
+  const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
@@ -100,9 +94,10 @@ export const Customer = () => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
   useEffect(() => {
     fetchCustomers();
-  }, []);
+  }, [page, rowsPerPage]);
 
   const fetchCustomers = async () => {
     try {
@@ -112,21 +107,22 @@ export const Customer = () => {
       };
 
       const response = await axios.post(
-        'http://146.190.164.174:4000/api/customer/get_customers',
-        {},
+        `http://146.190.164.174:4000/api/customer/get_customers?page=${page}&limit=${rowsPerPage}`, {}, 
         { headers: headers }
       );
 
+      setnextCustomer(response.data.count)
       console.log('Fetched customers:', response.data);
 
       if (response.data && response.data.customer) {
         setCustomers(response.data.customer.map((customer, index) => ({
           ...customer,
-          id: customer.id || index, firstName: '',
+          id: page * rowsPerPage + index + 1, // Generate sequential IDs
+          firstName: '',
           lastName: '',
           email: '',
           password: '',
-          industryType: '', // Reset industryType state
+          industryType: '', 
           customerType: ''
         })));
       } else {
@@ -142,6 +138,7 @@ export const Customer = () => {
 
   const handleDelete = async (id) => {
     try {
+      setLoading(true); // Set loading state to true
       const response = await axios.delete(`http://146.190.164.174:4000/api/customer/delete_customer/${id}`, {
         headers: {
           'x-sh-auth': localStorage.getItem('token')
@@ -151,11 +148,10 @@ export const Customer = () => {
       setCustomers(customers.filter((customer) => customer._id !== id));
     } catch (error) {
       console.error("Error deleting customer:", error.response);
+    } finally {
+      setLoading(false); // Clear loading state regardless of success or failure
     }
   };
-
-  const navigate = useNavigate();
-
 
   const SearchBar = ({ setSearchQuery }) => (
     <form>
@@ -180,7 +176,6 @@ export const Customer = () => {
               Add Customer
             </Button>
           </Link>
-
         </div>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }} className='mt-3'>
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -193,35 +188,39 @@ export const Customer = () => {
             }}
           />
         </div>
-        {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <CircularProgress />
-          </div>
-        ) : (
+     
           <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table stickyHeader aria-label="sticky table">
+                {/* //table head */}
                 <TableHead>
                   <TableRow>
-                    {columns.map((column) => (
-                      <TableCell key={column.id} align="center" style={{ minWidth: column.minWidth }}>
-                        {column.label}
+                    {columns.map((index) => (
+                      <TableCell  align="center" style={{ minWidth: index.minWidth }}>
+                        {index.label}
                       </TableCell>
                     ))}
                     <TableCell align="center">Actions</TableCell>
                   </TableRow>
                 </TableHead>
+                {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <CircularProgress />
+          </div>
+        ) : (
                 <TableBody>
-                  {customers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                  {customers.map((row) => {
                     return (
-                      <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
+                      // table row //tabIndex={-1} key={row._id}
+                      <TableRow hover role="checkbox" > 
                         {columns.map((column) => {
                           const value = row[column.id];
                           return (
-                            <TableCell key={column.id} align={column.align}>
-                              {column.id === 'email' ? row.user.email : row[column.id]}
+                            <TableCell >
+                              {column.id === '_id' ? row.id : column.id === 'email' ? row.user.email : row[column.id]}
                             </TableCell>
                           );
+                          
                         })}
                         <TableCell>
                           <React.Fragment>
@@ -244,7 +243,6 @@ export const Customer = () => {
                                 <Button autoFocus onClick={handleClose}>
                                   Cancel
                                 </Button>
-                                
                                 <Button onClick={() => {
                                   handleDelete(row.user._id);
                                   handleClose(); // Close the dialog box
@@ -253,27 +251,26 @@ export const Customer = () => {
                             </Dialog>
                           </React.Fragment>
                           <Button onClick={() => handleEditCustomer(row)}> <EditIcon /></Button>
-
                         </TableCell>
                       </TableRow>
                     );
                   })}
                 </TableBody>
+                     )}
               </Table>
             </TableContainer>
             <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
+              rowsPerPageOptions={[1, 2, 3, 5,10]}
               component="div"
-              count={customers.length}
+              count={customers.length ? nextcustomer :0}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </Paper>
-        )}
+   
       </div>
-
     </div>
   );
 };
