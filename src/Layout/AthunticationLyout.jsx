@@ -8,7 +8,7 @@ export const AthunticationLyout = () => {
 
     return (
         <>
-                {auth ? <Outlet /> : <Navigate to="/" />}
+                {auth ? <Outlet /> : <Navigate to="/dashboard" />}
         </>
     )
 }

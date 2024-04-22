@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
-import { logo } from '../Asset';
+
+import React, { useState } from 'react'
+
+import { Link } from 'react-router-dom';
+import { logo } from '../Asset'
+import { image2 } from '../Asset'
 import '@fontsource/roboto/500.css';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
@@ -12,31 +16,34 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { Button } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import axios from 'axios'; // Don't forget to import axios
-import { useNavigate } from 'react-router-dom';
-export const Signpage = () => {
-  const navigate = useNavigate()
+import axios from 'axios';
+import CircleIcon from '@mui/icons-material/Circle';
 
-  const [password, setPassword] = useState('');
-  const [errorMsg, seterrorMsg] = useState('');
+
+export const Signpage = () => {
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [password, setPassword] = useState('')
+  const [error, seterrorMsg] = useState('')
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     password: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
+  })
 
-  const passwordChange = (e) => {
-    setPassword(e.target.value);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
-
-  const handelchange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (event) => {
+    setPassword(event.target.value);
   };
-
-
+  const handlleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+  //handle Signup Api customer
   const handelSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,7 +71,6 @@ export const Signpage = () => {
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token);
         console.log('SignUp successful:', response.data);
-        navigate('/');
         // Do something after successful signup, like redirecting to sign-in page
       } else {
         console.error('Error fetching data:', response.statusText);
@@ -73,84 +79,77 @@ export const Signpage = () => {
       console.error('SignUp error:', error.response);
     }
   };
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
+  //handle button case 
   const isLowerCase = /[a-z]/.test(password);
   const isUpperCase = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
   const isMinLength = password.length >= 8;
-
   return (
-    <div>
-      <div className='container-fluid'>
-        <div className='row'>
-          <div className='col-7'>
-            <div className='logoTwo'>
-              <img src={logo} alt='Logo' />
-            </div>
-            <div className='container'>
-              <form onSubmit={handelSubmit}>
-                <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
-                  <h3 className='myHeading'>Get started with a Forever Free plan</h3>
-                  <p className='heading'>Sign up in seconds. No credit card required.</p>
-                </FormControl>
+    <div className='container-fluid'>
+      <div className='row'>
+        <div className='col-lg-7 col-sm-12' >
+          <div className='logo2'>
+            <img src={logo} />
+          </div>
+          <div className='container'>
+            <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
+              <h3 className='myHeading'>Get started with a Forever Free  plan</h3>
+              <p className='heading'>Sign up  in scond. No credit card required.</p>
 
+            </FormControl>
+            <form onSubmit={handelSubmit}>
+              <div>
                 <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
                   <TextField
                     required
-                    id="outlined-required"
+                    name='firstName'
+                    id="outlined-password-input ,outline-size-small"
                     label="First Name"
-                    size="small"
-                    onChange={handelchange}
-                    name="firstName"
+                    type="First Name"
+                    size='small'
+                    onChange={handlleChange}
                   />
                 </FormControl>
-
                 <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
                   <TextField
-                    id="outlined-basic"
+                    id="outlined-password-input ,outline-size-small"
                     label="Last Name"
-                    size="small"
-                    onChange={handelchange}
-                    name="lastName"
+                    type="Last Name"
+                    name='lastName'
+                    size='small'
+                    onChange={handlleChange}
                   />
                 </FormControl>
-
                 <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
                   <TextField
                     required
-                    id="outlined-required"
+                    name='email'
+                    id="outlined-password-input ,outline-size-small"
                     label="Email"
-                    size="small"
-                    onChange={handelchange}
-                    name="email"
+                    type="email"
+                    size='small'
+                    onChange={handlleChange}
                   />
                 </FormControl>
-
                 <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
                   <TextField
-                    id="outlined-basic"
+                    id="outlined-password-input ,outline-size-small"
                     label="Phone"
-                    size="small"
-                    type='number'
-                    name='phone'
-                    onKeyDown={(e) => e.key === 'e' && e.preventDefault()} // Prevent 'e' key
+                    type="number"
+                    size='small'
+                    onChange={handlleChange}
                   />
                 </FormControl>
-
+                <br />
                 <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
-                  <InputLabel htmlFor="outlined-adornment-password" size="small">Password</InputLabel>
+                  <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                   <OutlinedInput
-                    size="small"
                     name='password'
-                    id="outlined-adornment-password"
+
+                    id="outlined-adornment-password ,outline-size-small"
                     type={showPassword ? 'text' : 'password'}
-                    onChange={passwordChange}
+                    size='small'
+                    onChange={handleChange}
                     endAdornment={
                       <InputAdornment position="end">
                         <IconButton
@@ -164,119 +163,107 @@ export const Signpage = () => {
                       </InputAdornment>
                     }
                     label="Password"
+
                   />
-
                   <div className='row'>
-
                     <div className='col-6'>
                       <div className='validationDiv'>
-                        <FiberManualRecordIcon sx={{ color: isLowerCase ? '#00A95A' : 'gray', fontSize: 'small' }} />
-                        <span>One Lowercase character</span>
+                        <CircleIcon sx={{ color: isLowerCase ? 'green' : 'gray', fontSize: 'small' }} className='icon' />
+                        <span>One lowercase</span>
                       </div>
-
+                    </div>
+                    <div className='col-6'>
                       <div className='validationDiv'>
-                        <FiberManualRecordIcon sx={{ color: isUpperCase ? '#00A95A' : 'gray', fontSize: 'small' }} />
-                        <span>One Uppercase character</span>
+                        <CircleIcon sx={{ color: isUpperCase ? 'green' : 'gray', fontSize: 'small' }} />
+                        <span>One number must</span>
                       </div>
                     </div>
 
-                    <div className='col-6'>
-
-                      <div className='validationDiv'>
-                        <FiberManualRecordIcon sx={{ color: hasNumber ? '#00A95A' : 'gray', fontSize: 'small' }} />
-                        <span >One Number</span>
-                      </div>
-
-                      <div className='validationDiv'>
-                        <FiberManualRecordIcon sx={{ color: isMinLength ? '#00A95A' : 'gray', fontSize: 'small' }} />
-                        <span >8 character minimum</span>
-                      </div>
-
-                    </div >
-                    <span className='validationDivSpan'>  By clicking.you agree to term of Use.Privacy Policy and Anti-Spam Policy
-                    </span>
                   </div>
+                  <div className='row'>
+                    <div className='col-6'>
+                      <div className='validationDiv'>
+                        <CircleIcon sx={{ color: hasNumber ? 'green' : 'gray', fontSize: 'small' }} />
+                        <span> One uppercase</span>
+                      </div>
+                    </div>
+                    <div className='col-6'>
+                      <div className='validationDiv'>
+                        <CircleIcon sx={{ color: isMinLength ? 'green' : 'gray', fontSize: 'small' }} />
+                        <span>8 charcter minimum</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className='validationDivSpan'>  By clicking.you agree to term of Use.Privacy Policy and Anti-Spam Policy
+                  </span>
 
-
-
-
-                </FormControl>
-
-                <br />
-
-                <FormControl>
-                  <b className='myHeading'>{errorMsg}</b>
-
-                </FormControl>
-                <br />
-
-                <FormControl sx={{ m: 1, width: '45ch' }} variant="outlined">
-                  <Button className='myBtn'
-                    type="submit"
+                  <br />
+                  <Button
                     variant="contained"
-                    size="medium"
-                    style={{ textTransform: 'capitalize' }}
-                  >
+                    size="large"
+                    className='myBtn'
+                    type='submit'
+                    style={{ textTransform: 'capitalize' }}>
                     Create my account
                   </Button>
+
                 </FormControl>
-
-              </form>
-            </div>
-
+              </div>
+            </form>
           </div>
-          <div className='col-5  col-sm-5 d-none d-md-block RightSection' >
-            <div className='RightSectionText'>
+        </div>
+        <div className='col-5 RightSection' >
+          <div className='RightSectionText'>
 
 
-              <ul>
-                <li>
-                  <h3>
-                    Try Advanced Feature htmlFor 30 days.
-                  </h3>
+            <ul>
+              <li>
+                <h3>
+                  Try Advanced Feature htmlFor 30 days.
+                </h3>
 
-                </li>
-                <p>Your  30-daystrail of Advanced features includes:</p>
-                <li>
-                  <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
-                  <span style={{ marginLeft: '5px' }}>Access to premium features</span>
-                </li>
-                <p>Live chat templates library, auto-resend promotion, pop-ups, AI writing assistant, and more</p>
+              </li>
+              <p>Your  30-daystrail of Advanced features includes:</p>
+              <li>
+                <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
+                <span style={{ marginLeft: '5px' }}>Access to premium features</span>
+              </li>
+              <p>Live chat templates library, auto-resend promotion, pop-ups, AI writing assistant, and more</p>
 
-                <li>
-                  <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
-                  <span style={{ marginLeft: '5px' }}>Access to main features</span>
-                </li>
-                <p>Email landing page, website building, and more</p>
+              <li>
+                <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
+                <span style={{ marginLeft: '5px' }}>Access to main features</span>
+              </li>
+              <p>Email landing page, website building, and more</p>
 
-                <li>
-                  <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
-                  <span style={{ marginLeft: '5px' }}>Up to 1,000 subscribers</span>
-                </li>
+              <li>
+                <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
+                <span style={{ marginLeft: '5px' }}>Up to 1,000 subscribers</span>
+              </li>
 
-                <li>
-                  <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
-                  <span style={{ marginLeft: '5px' }}>Send up to 12,000 emails per month</span>
-                </li>
+              <li>
+                <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
+                <span style={{ marginLeft: '5px' }}>Send up to 12,000 emails per month</span>
+              </li>
 
-                <li>
-                  <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
-                  <span style={{ marginLeft: '5px' }}>24/7 live chat support</span>
-                </li>
+              <li>
+                <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
+                <span style={{ marginLeft: '5px' }}>24/7 live chat support</span>
+              </li>
 
-                <li>
-                  <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
-                  <span style={{ marginLeft: '5px' }}>Upgrade anytime</span>
-                </li>
-              </ul>
-
-            </div>
+              <li>
+                <span><CheckCircleIcon sx={{ fontSize: 'medium' }} /></span>
+                <span style={{ marginLeft: '5px' }}>Upgrade anytime</span>
+              </li>
+            </ul>
 
           </div>
 
         </div>
+
       </div>
     </div>
+
 
 
   )

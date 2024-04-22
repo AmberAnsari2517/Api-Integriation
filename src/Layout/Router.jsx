@@ -19,20 +19,17 @@ export const Router = () => {
     <div>
 
       <Routes>
-        <Route  element={<DashboardLyout />}>
+        <Route path='/'  element={<DashboardLyout />}>
           <Route path='/dashboard' element ={<Dashboard/>}/>
           <Route path="/customer" element={<Customer />} />
           <Route path="/addcustomer" element={<AddCustomer/>} />
-          <Route path="/support-tickets" element={<Support />} />
-          <Route path="/transactions" element={<Transection />} />
           <Route path='/changepassword' element={<Changepassword/>}/>
           <Route path="edit/:id" element={<Edit />} />
         </Route>
-        <Route path='/' element={<AthunticationLyout />}>
-        <Route path='/forget' element={<Forgetpassword/>}/>
-
-          <Route path="/" element={<Loginpages />} />
+        <Route  element={<AthunticationLyout />}>
+        <Route path="/login" element={<Loginpages />} />
           <Route path="/Signup" element={<Signpage/>}/>
+        <Route path='/forget' element={<Forgetpassword/>}/>
         </Route>
       </Routes>
 

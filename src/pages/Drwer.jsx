@@ -90,7 +90,7 @@ export const Pagelyout = () => {
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
 
-        <AppBar position="fixed" style={{ background: 'white', boxShadow: 'white' }}>
+        <AppBar position="fixed" style={{ background: 'white', boxShadow: 'none' }}>
           <div style={{ marginLeft: 'auto' }}>
             <Button
               style={{ marginRight: 17, marginTop: '15px', marginRight: '15px' }}

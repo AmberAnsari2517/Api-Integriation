@@ -84,7 +84,7 @@
     height: 200px;
     width: 300px;
     margin: 20px;
-    background-color: rgb(148, 238, 167);
+    background-color: #e4fcc6;
     border-radius: 15px;
    
 }
@@ -92,7 +92,7 @@
     height: 200px;
     width: 300px;
     margin: 20px;
-    background-color: #D0F2FE;
+    background-color: #d0f2fe;
    
 
 }
@@ -100,7 +100,7 @@
     height: 200px;
     width: 300px;
     margin: 20px;
-    background-color: #FFE8DA;
+    background-color: #ffe7da;
     border-radius: 15px;
 }
 .fab{

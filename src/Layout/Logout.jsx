@@ -20,7 +20,7 @@ export const Logout = async (navigate) => {
           localStorage.removeItem('token');
           localStorage.removeItem('email');
 
-          navigate('/');
+          navigate('/login');
           return true;
       } else {
           console.error('Unexpected status code:', response.status);

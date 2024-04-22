@@ -33,7 +33,7 @@ export const DashboardLyout = () => {
         <StyledRoot>
             <Pagelyout />
             <Main>
-                {auth ? <Outlet /> : <Navigate to="/" />} {/* Use Navigate component */}
+                {auth ? <Outlet /> : <Navigate to="/login" />} {/* Use Navigate component */}
             </Main>
         </StyledRoot>
     );

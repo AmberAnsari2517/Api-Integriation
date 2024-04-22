@@ -43,33 +43,70 @@ export const AddCustomer = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (event) => {
-        const { firstName, lastName, email, password, industryType, customerType } = formData;
+    // const handleSubmit = async (event) => {
+    //     const { firstName, lastName, email, password, industryType, customerType } = formData;
 
-        event.preventDefault();
+    //     event.preventDefault();
+    //     try {
+    //         const response = await axios.post('http://146.190.164.174:4000/api/customer/signup_customer', {
+    //             first_name: firstName,
+    //             last_name: lastName,
+    //             email: email,
+    //             password: password,
+    //             industry_type: industryType, // Send industryType in request
+    //             customer_type: customerType, // Send customerType in request
+    //         });
+    //         console.log('Customer added successfully:', response.data);
+    //         setFormData({
+    //             firstName: '',
+    //             lastName: '',
+    //             email: '',
+    //             password: '',
+    //             industryType: '', // Reset industryType state
+    //             customerType: '' // Reset customerType state
+    //         });
+    //         setSuccessAlert(true);
+    //     } catch (error) {
+    //         console.error('Error adding customer:', error.response);
+    //         setErrorAlert(true);
+    //         setErrorMessage(error.response.data.message);
+    //     }
+    // };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+     
+
+        const requestObj = {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            password: formData.password,
+            industry_type:formData.industryType,
+            customer_type:formData.customerType,
+            
+    
+        };
+
+        const headers = { 'Content-Type': 'application/json' };
+
         try {
-            const response = await axios.post('http://146.190.164.174:4000/api/customer/signup_customer', {
-                first_name: firstName,
-                last_name: lastName,
-                email: email,
-                password: password,
-                industry_type: industryType, // Send industryType in request
-                customer_type: customerType, // Send customerType in request
-            });
-            console.log('Customer added successfully:', response.data);
-            setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                industryType: '', // Reset industryType state
-                customerType: '' // Reset customerType state
-            });
-            setSuccessAlert(true);
+            const response = await axios.post(
+                'http://146.190.164.174:4000/api/customer/signup_customer',
+                requestObj,
+                { headers }
+            );
+            if (response.status === 200) {
+                console.log('Add Customer successful:', response.data);
+                setSuccessAlert(true); // Display success alert
+                navigate("/customer")
+            } else {
+                console.error('Error fetching data:', response.statusText);
+            }
         } catch (error) {
-            console.error('Error adding customer:', error.response);
-            setErrorAlert(true);
-            setErrorMessage(error.response.data.message);
+            console.error('Add Customer error:', error.response);
+            setErrorAlert(true); // Display error alert
+            setErrorMessage(error.response.data.message); // Set error message
         }
     };
 
@@ -117,7 +154,7 @@ export const AddCustomer = () => {
 
 
     return (
-        <div style={{ marginTop: -80 }}>
+        <div style={{ marginTop: -10}}>
 
                 <div className='container'>
 
@@ -226,7 +263,7 @@ export const AddCustomer = () => {
                                         variant="outlined" color='success' startIcon={<CloseIcon />}>
                                         Close
                                     </Button>
-                                    <Button type='submit' variant="contained" className='btn'>
+                                    <Button type='submit' variant="contained" className='btn' onClick={handleSubmit}>
                                         Send
                                     </Button>
                                 </Stack>

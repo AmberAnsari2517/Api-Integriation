@@ -66,17 +66,20 @@ export const Customer = () => {
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleClickOpen = (customerId) => {
+    setSelectedCustomerId(customerId);
+    // setOpen(true)
   };
 
   const handleClose = () => {
-    setOpen(false);
+    // setOpen(false);
+    setSelectedCustomerId(null);
+
   };
 
   const handleEditCustomer = (row) => {
     console.log(row._id, "hjkkhjj");
-    navigate(`/edit/${row.user._id}`, { state: row })//faiza
+    navigate(`/edit/${row.user._id}`, { state: row })
   }
 
   const [page, setPage] = useState(0);
@@ -84,6 +87,8 @@ export const Customer = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+
 
   const [nextcustomer, setnextCustomer] = useState();
   const handleChangePage = (event, newPage) => {
@@ -107,7 +112,7 @@ export const Customer = () => {
       };
 
       const response = await axios.post(
-        `http://146.190.164.174:4000/api/customer/get_customers?page=${page}&limit=${rowsPerPage}`, {}, 
+        `http://146.190.164.174:4000/api/customer/get_customers?page=${page}&limit=${rowsPerPage}`, {},
         { headers: headers }
       );
 
@@ -122,7 +127,7 @@ export const Customer = () => {
           lastName: '',
           email: '',
           password: '',
-          industryType: '', 
+          industryType: '', // Reset industryType state
           customerType: ''
         })));
       } else {
@@ -138,18 +143,18 @@ export const Customer = () => {
 
   const handleDelete = async (id) => {
     try {
-      setLoading(true); // Set loading state to true
       const response = await axios.delete(`http://146.190.164.174:4000/api/customer/delete_customer/${id}`, {
         headers: {
           'x-sh-auth': localStorage.getItem('token')
         }
       });
-      console.log("Customer deleted:", id);
-      setCustomers(customers.filter((customer) => customer._id !== id));
+      if (response.status === 200) {
+        console.log("Customer deleted:", id);
+        fetchCustomers();
+      }
+
     } catch (error) {
       console.error("Error deleting customer:", error.response);
-    } finally {
-      setLoading(false); // Clear loading state regardless of success or failure
     }
   };
 
@@ -188,48 +193,46 @@ export const Customer = () => {
             }}
           />
         </div>
-     
-          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer sx={{ maxHeight: 440 }}>
-              <Table stickyHeader aria-label="sticky table">
-                {/* //table head */}
-                <TableHead>
-                  <TableRow>
-                    {columns.map((index) => (
-                      <TableCell  align="center" style={{ minWidth: index.minWidth }}>
-                        {index.label}
-                      </TableCell>
-                    ))}
-                    <TableCell align="center">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <CircularProgress />
-          </div>
-        ) : (
+
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell key={column.id} align="center" style={{ minWidth: column.minWidth }}>
+                      {column.label}
+                    </TableCell>
+                  ))}
+                  <TableCell align="center">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              {loading ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                  <CircularProgress />
+                </div>
+              ) : (
                 <TableBody>
                   {customers.map((row) => {
                     return (
-                      // table row //tabIndex={-1} key={row._id}
-                      <TableRow hover role="checkbox" > 
+                      <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
                         {columns.map((column) => {
                           const value = row[column.id];
                           return (
-                            <TableCell >
+                            <TableCell key={column.id} align={column.align}>
                               {column.id === '_id' ? row.id : column.id === 'email' ? row.user.email : row[column.id]}
                             </TableCell>
                           );
-                          
+
                         })}
                         <TableCell>
                           <React.Fragment>
-                            <Button variant="outlined" onClick={handleClickOpen}>
+                            <Button variant="outlined" onClick={() => handleClickOpen(row._id)}>
                               <DeleteIcon />
                             </Button>
                             <Dialog
                               fullScreen={fullScreen}
-                              open={open}
+                              open={selectedCustomerId === row._id}
                               onClose={handleClose}
                               aria-labelledby="responsive-dialog-title"
                             >
@@ -256,20 +259,20 @@ export const Customer = () => {
                     );
                   })}
                 </TableBody>
-                     )}
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[1, 2, 3, 5,10]}
-              component="div"
-              count={customers.length ? nextcustomer :0}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Paper>
-   
+              )}
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[1, 2, 3, 5, 10]}
+            component="div"
+            count={customers.length ? nextcustomer : 0}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+
       </div>
     </div>
   );
